@@ -1,3 +1,4 @@
+alert("game.js 已載入");
 let player = {
     name:"",
     level:1,
