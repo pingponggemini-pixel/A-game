@@ -1,34 +1,50 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>我的冒險遊戲</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maple RPG</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body style="background: #4ab34a; text-align: center; padding-top: 100px; margin: 0;">
+<body>
 
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>我的精美 RPG 遊戲</title>
-</head>
-<body style="background-image: url('https://img.itch.zone/aW1nLzExNzM3Nzg0LnBuZw==/315x250c/Z86Y9r.png'); background-size: 100px; text-align: center; padding-top: 100px; margin: 0;">
+<div id="loginScreen">
+    <h1>Maple RPG</h1>
+    <input id="username" placeholder="輸入角色名稱">
+    <button onclick="login()">開始冒險</button>
+</div>
 
-    <h1 style="background: rgba(0,0,0,0.6); color: white; display: inline-block; padding: 10px 20px; border-radius: 10px;">🌲 冒險的起點 🌲</h1>
+<div id="gameScreen" style="display:none">
 
-    <div style="margin-top: 50px;">
-        
-        <img src="https://img.itch.zone/aW1nLzE0ODE1OTY4LmdpZg==/original/b3gYtA.gif" width="150" style="margin-right: 50px; vertical-align: middle;">
-        
-        <img src="https://img.itch.zone/aW1nLzE0ODE1OTY5LmdpZg==/original/pYVb9x.gif" width="130" style="vertical-align: middle;">
-        
+    <h2 id="playerName"></h2>
+
+    <div class="stats">
+        <p>等級：<span id="level"></span></p>
+        <p>HP：<span id="hp"></span></p>
+        <p>攻擊：<span id="atk"></span></p>
+        <p>金幣：<span id="gold"></span></p>
     </div>
 
-</body>
-</html>
+    <hr>
 
-        
-    </div>
+    <h3>地圖</h3>
 
+    <button onclick="fight('菇菇寶貝')">
+        菇菇森林
+    </button>
+
+    <button onclick="fight('綠水靈')">
+        綠水靈森林
+    </button>
+
+    <button onclick="gacha()">
+        裝備轉蛋
+    </button>
+
+    <div id="log"></div>
+
+</div>
+
+<script src="js/game.js"></script>
 </body>
 </html>
