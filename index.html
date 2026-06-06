@@ -3,25 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maple RPG - 模組化第二版</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Maple RPG - 第二版 終極整合版</title>
+    <style>
+        /* ==========================================
+           [區塊一] CSS 畫面與平板按紐美化
+           ========================================== */
+        body {
+            background: #f0f8ff;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #loginScreen {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: inline-block;
+            margin-top: 50px;
+        }
+
+        #username {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        canvas {
+            background: #87CEEB;
+            display: block;
+            margin: 10px auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 800px;
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* 平板專用虛擬按鍵 */
+        .touch-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin: 15px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .d-pad, .action-pad {
+            display: flex;
+            gap: 15px;
+        }
+
+        .touch-btn {
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            cursor: pointer;
+        }
+
+        .touch-btn:active {
+            background: rgba(255, 153, 0, 0.8);
+        }
+
+        #log {
+            width: 100%;
+            max-width: 780px;
+            height: 100px;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            overflow-y: auto;
+            text-align: left;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #inventory {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            background: white;
+            padding: 10px;
+            width: 100%;
+            max-width: 780px;
+            border-radius: 4px;
+            min-height: 50px;
+            overflow-x: auto;
+            box-sizing: border-box;
+        }
+
+        .inv-item {
+            padding: 5px 10px;
+            border: 1px dashed #ff9900;
+            background: #fff9e6;
+            font-size: 12px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        button {
+            padding: 8px 15px;
+            background: #ff9900;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #e68a00; }
+    </style>
 </head>
 <body>
 
     <div id="loginScreen">
         <h1>🍁 Maple RPG 🍁</h1>
-        <p>歡迎回來，James 的冒險世界</p>
+        <p>歡迎來到 James 的二版動作世界</p>
         <input id="username" placeholder="輸入你的角色名稱" value="James">
         <button onclick="login()">開始冒險</button>
     </div>
 
-    <div id="gameScreen" style="display:none;">
+    <div id="gameScreen" class="game-container" style="display:none">
         <div class="stats-bar">
             <span id="playerName">冒險者</span>
             <span>Lv. <span id="level">1</span></span>
             <span>HP: <span id="hp">100/100</span></span>
             <span>ATK: <span id="atk">10</span></span>
             <span>金幣: <span id="gold">0</span></span>
+        </div>
+
+        <div style="margin: 10px 0;">
+            <button style="background:#4CAF50" onclick="saveGame()">💾 存檔</button>
+            <button style="background:#2196F3" onclick="loadGame()">📂 讀檔</button>
+            <button style="background:#9c27b0" onclick="gacha()">🎁 轉蛋 (20金)</button>
         </div>
 
         <canvas id="gameCanvas" width="800" height="400"></canvas>
@@ -37,18 +190,248 @@
             </div>
         </div>
 
-        <div style="margin: 10px;">
-            <button onclick="saveGame()">💾 存檔</button>
-            <button onclick="loadGame()">📂 讀檔</button>
-            <button onclick="gacha()">🎁 轉蛋 (20金)</button>
-        </div>
         <div id="log"></div>
+        <h4 style="margin: 5px 0 0 0;">🎒 背包</h4>
+        <div id="inventory"></div>
     </div>
 
-     <script src="js/ui.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/monster.js"></script>
-    <script src="js/game.js"></script>
+    <script>
+        // --- [子區塊 A：Player 玩家資料與控制] ---
+        let player = {
+            name: "James", level: 1, hp: 100, maxHp: 100, baseAttack: 10, gold: 0, exp: 0, inventory: [], weapon: null,
+            x: 100, y: 200, width: 30, height: 45, velocityX: 0, velocityY: 0, speed: 4, jumping: false, grounded: false,
+            isAttacking: false, attackCooldown: 0, direction: "right"
+        };
+
+        const keys = {};
+        window.addEventListener("keydown", (e) => { keys[e.code] = true; });
+        window.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+        function setupTouchControls() {
+            const bind = (id, key) => {
+                const el = document.getElementById(id);
+                el.addEventListener("touchstart", (e) => { e.preventDefault(); keys[key] = true; });
+                el.addEventListener("touchend", () => { keys[key] = false; });
+                el.addEventListener("mousedown", () => { keys[key] = true; });
+                el.addEventListener("mouseup", () => { keys[key] = false; });
+                el.addEventListener("mouseleave", () => { keys[key] = false; });
+            };
+            bind("btnLeft", "ArrowLeft");
+            bind("btnRight", "ArrowRight");
+            bind("btnJump", "AltLeft");
+            bind("btnAttack", "ControlLeft");
+        }
+
+        function getAttack() { return player.baseAttack + (player.weapon ? player.weapon.attack : 0); }
+
+        function levelCheck() {
+            let needExp = player.level * 50;
+            if(player.exp >= needExp) {
+                player.exp -= needExp;
+                player.level++;
+                player.maxHp += 20;
+                player.hp = player.maxHp;
+                player.baseAttack += 4;
+                addLog(`🌟 恭喜升級！目前等級達 Lv.${player.level}！`);
+                updateUI();
+            }
+        }
+
+        // --- [子區塊 B：UI 介面與日誌] ---
+        function login() {
+            const nameInput = document.getElementById("username").value.trim();
+            if(!nameInput) return alert("請輸入名字");
+            player.name = nameInput;
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("gameScreen").style.display = "flex";
+            
+            addLog("【系統】遊戲初始化成功！用鍵盤方向鍵或螢幕按鈕移動，Alt/跳躍，Ctrl/攻擊。");
+            initGame();
+        }
+
+        function updateUI() {
+            document.getElementById("playerName").innerText = "🍁 冒險者：" + player.name;
+            document.getElementById("level").innerText = player.level;
+            document.getElementById("hp").innerText = Math.max(0, player.hp) + "/" + player.maxHp;
+            document.getElementById("atk").innerText = getAttack();
+            document.getElementById("gold").innerText = player.gold;
+        }
+
+        function addLog(text) {
+            const log = document.getElementById("log");
+            log.innerHTML += text + "<br>";
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateInventory() {
+            const inv = document.getElementById("inventory");
+            if(player.inventory.length === 0) {
+                inv.innerHTML = '<span style="color:#aaa">背包目前是空的</span>';
+                return;
+            }
+            inv.innerHTML = "";
+            player.inventory.forEach((item, index) => {
+                let isEquip = player.weapon === item;
+                inv.innerHTML += `
+                    <div class="inv-item" style="${isEquip ? 'border-color: red; background:#ffe6e6;' : ''}">
+                        <b>${item.name}</b> (+${item.attack}) 
+                        ${isEquip ? '[裝備中]' : `<button style="padding:2px 5px; font-size:11px;" onclick="equip(${index})">裝備</button>`}
+                    </div>
+                `;
+            });
+        }
+
+        function equip(index) {
+            player.weapon = player.inventory[index];
+            addLog(`🗡️ 已裝備 [${player.weapon.name}]`);
+            updateUI();
+            updateInventory();
+        }
+
+        // --- [子區塊 C：Monster 怪物 AI 與戰鬥判定] ---
+        let activeMonsters = [];
+        const monsterTemplates = {
+            "菇菇寶貝": { name: "菇菇寶貝", hp: 30, maxHp: 30, attack: 4, exp: 12, gold: 6, color: "#ff9966", width: 30, height: 30 },
+            "綠水靈": { name: "綠水靈", hp: 50, maxHp: 50, attack: 8, exp: 22, gold: 12, color: "#66ff66", width: 25, height: 25 }
+        };
+
+        function spawnMonster(type) {
+            let template = monsterTemplates[type];
+            if(!template) return;
+            activeMonsters.push({
+                ...JSON.parse(JSON.stringify(template)),
+                x: Math.random() * (canvas.width - 200) + 150,
+                y: physics.groundY - template.height,
+                direction: Math.random() > 0.5 ? 1 : -1,
+                moveTimer: Math.random() * 60
+            });
+        }
+
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
+        }
+
+        function executeAttack() {
+            let attackRange = {
+                y: player.y, height: player.height, width: 40,
+                x: player.direction === "right" ? player.x + player.width : player.x - 40
+            };
+            for (let i = activeMonsters.length - 1; i >= 0; i--) {
+                let monster = activeMonsters[i];
+                if (checkCollision(attackRange, monster)) {
+                    let dmg = getAttack();
+                    monster.hp -= dmg;
+                    addLog(`⚔️ James 對 ${monster.name} 造成了 ${dmg} 點傷害！`);
+                    if (monster.hp <= 0) {
+                        addLog(`🎉 擊敗 ${monster.name}！獲得金幣 +${monster.gold}, 經驗 +${monster.exp}`);
+                        player.gold += monster.gold; player.exp += monster.exp;
+                        let type = monster.name;
+                        activeMonsters.splice(i, 1);
+                        setTimeout(() => { spawnMonster(type); }, 3000);
+                        levelCheck(); updateUI();
+                    }
+                }
+            }
+        }
+
+        // --- [子區塊 D：Game 核心物理與主循環] ---
+        const physics = { gravity: 0.5, friction: 0.8, groundY: 340 };
+        let canvas, ctx;
+
+        function initGame() {
+            canvas = document.getElementById("gameCanvas");
+            ctx = canvas.getContext("2d");
+            setupTouchControls();
+            activeMonsters = []; // 清空舊怪物
+            spawnMonster("菇菇寶貝");
+            spawnMonster("綠水靈");
+            updateUI();
+            updateInventory();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 玩家移動
+            if (keys["ArrowLeft"]) { if (player.velocityX > -player.speed) player.velocityX--; player.direction = "left"; }
+            if (keys["ArrowRight"]) { if (player.velocityX < player.speed) player.velocityX++; player.direction = "right"; }
+            if (keys["AltLeft"] && !player.jumping && player.grounded) { player.jumping = true; player.grounded = false; player.velocityY = -10; }
+            if (keys["ControlLeft"] && player.attackCooldown <= 0) { player.isAttacking = true; player.attackCooldown = 20; executeAttack(); }
+
+            if (player.attackCooldown > 0) {
+                player.attackCooldown--;
+                if (player.attackCooldown < 10) player.isAttacking = false;
+            }
+
+            player.velocityX *= physics.friction; player.velocityY += physics.gravity;
+            player.x += player.velocityX; player.y += player.velocityY;
+
+            if (player.y + player.height >= physics.groundY) { player.y = physics.groundY - player.height; player.velocityY = 0; player.jumping = false; player.grounded = true; }
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // 怪物 AI 與繪製
+            activeMonsters.forEach((monster) => {
+                monster.moveTimer--;
+                if(monster.moveTimer <= 0) { monster.direction = Math.random() > 0.5 ? 1 : -1; monster.moveTimer = Math.random() * 120 + 30; }
+                monster.x += monster.direction * 0.8;
+                if(monster.x < 100) monster.direction = 1;
+                if(monster.x + monster.width > canvas.width) monster.direction = -1;
+
+                ctx.fillStyle = monster.color;
+                ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+                ctx.fillStyle = "red"; ctx.fillRect(monster.x, monster.y - 8, monster.width, 4);
+                ctx.fillStyle = "green"; ctx.fillRect(monster.x, monster.y - 8, monster.width * (monster.hp / monster.maxHp), 4);
+
+                if (checkCollision(player, monster) && Math.random() < 0.03) {
+                    player.hp -= monster.attack; updateUI();
+                    addLog(`⚠️ James 受到 ${monster.name} 的碰撞傷害 ${monster.attack} 點。`);
+                    if(player.hp <= 0) { player.x = 100; player.y = 200; player.hp = player.maxHp; updateUI(); addLog("☠️ James 傳回村莊復活。"); }
+                }
+            });
+
+            // 繪製場景
+            ctx.fillStyle = "#228B22";
+            ctx.fillRect(0, physics.groundY, canvas.width, canvas.height - physics.groundY);
+
+            // 繪製 James
+            ctx.fillStyle = player.isAttacking ? "#ffff00" : "#ff4500";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            if (player.isAttacking) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+                if (player.direction === "right") ctx.fillRect(player.x + player.width, player.y, 40, player.height);
+                else ctx.fillRect(player.x - 40, player.y, 40, player.height);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gacha() {
+            if(player.gold < 20) return addLog("<span style='color:red;'>【轉蛋】金幣不足！</span>");
+            player.gold -= 20;
+            let r = Math.random(), item;
+            if(r < 0.6) item = { name: "新手木劍", attack: 3 };
+            else if(r < 0.9) item = { name: "合金短劍", attack: 8 };
+            else item = { name: "🍁 楓葉鋼刀 🍁", attack: 22 };
+            player.inventory.push(item);
+            addLog(`🎁 James 轉蛋獲得：<b>${item.name}</b> (ATK +${item.attack})`);
+            updateInventory(); updateUI();
+        }
+
+        function saveGame() { localStorage.setItem("mapleSingleSave", JSON.stringify(player)); addLog("【系統】存檔成功！"); }
+        function loadGame() {
+            const save = localStorage.getItem("mapleSingleSave");
+            if(save) {
+                player = JSON.parse(save);
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("gameScreen").style.display = "flex";
+                initGame();
+                addLog(`【系統】成功載入 V2 進度！歡迎回來，${player.name}`);
+            } else { alert("找不到存檔！"); }
+        }
+    </script>
 </body>
 </html>
-
