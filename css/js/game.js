@@ -64,3 +64,97 @@ function updateInventory() {
     });
     invDiv.innerHTML = html;
 }
+// ==========================================
+// player.js - 負責玩家(James)數據、物理與控制
+// ==========================================
+
+// 1. 玩家初始資料
+let player = {
+    name: "James", // 預設名字
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+    baseAttack: 10,
+    gold: 0,
+    exp: 0,
+    inventory: [],
+    weapon: null,
+
+    // 2D 動作物理屬性
+    x: 100,
+    y: 200,
+    width: 30,
+    height: 45,
+    velocityX: 0,
+    velocityY: 0,
+    speed: 4,
+    jumping: false,
+    grounded: false,
+    isAttacking: false,
+    attackCooldown: 0,
+    direction: "right" // 面向：left 或 right
+};
+
+// 2. 鍵盤輸入狀態
+const keys = {};
+window.addEventListener("keydown", (e) => { keys[e.code] = true; });
+window.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+// 3. 平板/手機觸控事件綁定
+function setupTouchControls() {
+    // 左移動
+    const btnLeft = document.getElementById("btnLeft");
+    btnLeft.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowLeft"] = true; });
+    btnLeft.addEventListener("touchend", () => { keys["ArrowLeft"] = false; });
+    // 支援電腦滑鼠點擊測試平板按紐
+    btnLeft.addEventListener("mousedown", () => { keys["ArrowLeft"] = true; });
+    btnLeft.addEventListener("mouseup", () => { keys["ArrowLeft"] = false; });
+
+    // 右移動
+    const btnRight = document.getElementById("btnRight");
+    btnRight.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ArrowRight"] = true; });
+    btnRight.addEventListener("touchend", () => { keys["ArrowRight"] = false; });
+    btnRight.addEventListener("mousedown", () => { keys["ArrowRight"] = true; });
+    btnRight.addEventListener("mouseup", () => { keys["ArrowRight"] = false; });
+
+    // 跳躍
+    const btnJump = document.getElementById("btnJump");
+    btnJump.addEventListener("touchstart", (e) => { e.preventDefault(); keys["AltLeft"] = true; });
+    btnJump.addEventListener("touchend", () => { keys["AltLeft"] = false; });
+    btnJump.addEventListener("mousedown", () => { keys["AltLeft"] = true; });
+    btnJump.addEventListener("mouseup", () => { keys["AltLeft"] = false; });
+
+    // 攻擊
+    const btnAttack = document.getElementById("btnAttack");
+    btnAttack.addEventListener("touchstart", (e) => { e.preventDefault(); keys["ControlLeft"] = true; });
+    btnAttack.addEventListener("touchend", () => { keys["ControlLeft"] = false; });
+    btnAttack.addEventListener("mousedown", () => { keys["ControlLeft"] = true; });
+    btnAttack.addEventListener("mouseup", () => { keys["ControlLeft"] = false; });
+}
+
+// 4. 計算總攻擊力
+function getAttack() {
+    return player.baseAttack + (player.weapon ? player.weapon.attack : 0);
+}
+
+// 5. 裝備武器邏輯
+function equipWeapon(index) {
+    player.weapon = player.inventory[index];
+    addLog(`🗡️ James 裝備了 [${player.weapon.name}]，攻擊力提升！`);
+    updateUI();
+    updateInventory();
+}
+
+// 6. 經驗值與升級檢查
+function levelCheck() {
+    let needExp = player.level * 50;
+    if(player.exp >= needExp) {
+        player.exp -= needExp;
+        player.level++;
+        player.maxHp += 20;
+        player.hp = player.maxHp; // 升級補滿血
+        player.baseAttack += 4;
+        addLog(`<span style="color: #ff6600; font-weight:bold;">🌟 James 升級了！目前等級達到 Lv.${player.level}！</span>`);
+        updateUI();
+    }
+}
