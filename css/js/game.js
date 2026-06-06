@@ -29,6 +29,13 @@ const monsters = {
         exp:20,
         gold:10
     }
+
+    "藍寶王":{
+        hp:300,
+        attack:20,
+        exp:100,
+        gold:100
+    }
 };
 
 function login(){
