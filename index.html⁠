@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>官方回合制戰鬥遊戲</title>
+    <style>
+        /* --- 🎨 靈魂注入接口：你可以在這裡改顏色與外觀 --- */
+        :root {
+            --bg-color: #1a1a1a;       /* 遊戲背景色 */
+            --text-color: #ffffff;     /* 文字顏色 */
+            --player-color: #4caf50;   /* 玩家血條顏色 */
+            --boss-color: #f44336;     /* 怪物血條顏色 */
+        }
+        /* ------------------------------------------------ */
+        body {
+            margin: 0; padding: 20px; background-color: var(--bg-color);
+            color: var(--text-color); font-family: sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            user-select: none; -webkit-user-select: none;
+        }
+        .game-container { width: 100%; max-width: 500px; text-align: center; }
+        .character-box { border: 2px solid #555; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .hp-bar-bg { width: 100%; height: 20px; background-color: #333; border-radius: 10px; overflow: hidden; margin-top: 5px; }
+        .hp-bar { height: 100%; width: 100%; transition: width 0.3s; }
+        #player-hp { background-color: var(--player-color); }
+        #boss-hp { background-color: var(--boss-color); }
+        .btn-group { display: flex; justify-content: space-around; margin-top: 20px; }
+        button { padding: 12px 24px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; background: #e0e0e0; }
+        button:active { background: #bbb; }
+        #log { height: 120px; border: 1px solid #444; background: #111; padding: 10px; margin-top: 20px; overflow-y: auto; text-align: left; font-size: 14px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚔️ 官方回合制對戰 ⚔️</h1>
+        
+        <div class="character-box">
+            <h2 id="boss-name">👾 邪惡首領 (Boss)</h2>
+            <div class="hp-bar-bg"><div id="boss-hp" class="hp-bar"></div></div>
+            <p>HP: <span id="boss-hp-text">100</span>/100</p>
+        </div>
+
+        <div class="character-box">
+            <h2 id="player-name">🛡️ 傳奇勇者 (Player)</h2>
+            <div class="hp-bar-bg"><div id="player-hp" class="hp-bar"></div></div>
+            <p>HP: <span id="player-hp-text">100</span>/100</p>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="playerAction('attack')">⚔️ 攻擊</button>
+            <button onclick="playerAction('heavy')">💥 重擊</button>
+            <button onclick="playerAction('heal')">🧪 治癒</button>
+        </div>
+
+        <div id="log">【系統】戰鬥開始！請下達指令...<br></div>
+    </div>
+
+    <script>
+        // --- 📊 靈魂注入接口：遊戲數值設定 ---
+        const CONFIG = {
+            playerName: "傳奇勇者", bossName: "邪惡首領",
+            playerMaxHP: 100, bossMaxHP: 100,
+            attackDmg: 12, heavyDmg: 25, healAmt: 20
+        };
+
+        let playerHP = CONFIG.playerMaxHP, bossHP = CONFIG.bossMaxHP;
+        document.getElementById('player-name').innerText = "🛡️ " + CONFIG.playerName;
+        document.getElementById('boss-name').innerText = "👾 " + CONFIG.bossName;
+
+        function logMsg(msg) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += msg + "<br>";
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function playerAction(type) {
+            if (playerHP <= 0 || bossHP <= 0) return;
+            
+            // 玩家回合
+            if (type === 'attack') {
+                bossHP -= CONFIG.attackDmg;
+                logMsg(`👉 你對 <b>${CONFIG.bossName}</b> 造成了 ${CONFIG.attackDmg} 點傷害！`);
+            } else if (type === 'heavy') {
+                if (Math.random() > 0.3) { // 70% 命中率
+                    bossHP -= CONFIG.heavyDmg;
+                    logMsg(`💥 💥 暴擊！你對 <b>${CONFIG.bossName}</b> 造成了 ${CONFIG.heavyDmg} 點致命傷害！`);
+                } else {
+                    logMsg(`💨 殘念！你的重擊被 <b>${CONFIG.bossName}</b> 閃過了！`);
+                }
+            } else if (type === 'heal') {
+                playerHP = Math.min(CONFIG.playerMaxHP, playerHP + CONFIG.healAmt);
+                logMsg(`🧪 你喝下藥水，回復了 ${CONFIG.healAmt} 點生命值。`);
+            }
+
+            updateUI();
+            if (checkWin()) return;
+
+            // 輪到怪物回合 (延遲 0.8 秒行動，比較有節奏感)
+            setTimeout(bossAction, 800);
+        }
+
+        function bossAction() {
+            if (playerHP <= 0 || bossHP <= 0) return;
+            // 怪物隨機攻擊
+            let dmg = Math.floor(Math.random() * 10) + 8; // 8~17 隨機傷害
+            playerHP -= dmg;
+            logMsg(`👹 <b>${CONFIG.bossName}</b> 發動反擊，對你造成了 ${dmg} 點傷害！`);
+            
+            updateUI();
+            checkWin();
+        }
+
+        function updateUI() {
+            const bPct = Math.max(0, (bossHP / CONFIG.bossMaxHP) * 100);
+            const pPct = Math.max(0, (playerHP / CONFIG.playerMaxHP) * 100);
+            document.getElementById('boss-hp').style.width = bPct + '%';
+            document.getElementById('player-hp').style.width = pPct + '%';
+            document.getElementById('boss-hp-text').innerText = Math.max(0, bossHP);
+            document.getElementById('player-hp-text').innerText = Math.max(0, playerHP);
+        }
+
+        function checkWin() {
+            if (bossHP <= 0) {
+                logMsg("<h3 style='color:#4caf50;'>🏆 戰鬥結束！你擊敗了首領，贏得了勝利！</h3>");
+                return true;
+            }
+            if (playerHP <= 0) {
+                logMsg("<h3 style='color:#f44336;'>💀 你被擊敗了... 遊戲結束。</h3>");
+                return true;
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
