@@ -64,8 +64,8 @@ function updateUI(){
         player.hp;
 
     document.getElementById("atk").innerText =
-        player.attack;
-
+        getAttack(); 
+    
     document.getElementById("gold").innerText =
         player.gold;
 }
