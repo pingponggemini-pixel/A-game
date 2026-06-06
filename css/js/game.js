@@ -215,3 +215,26 @@ function getAttack(){
 
     return atk;
 }
+
+function updateInventory(){
+
+    let html = "";
+
+    player.inventory.forEach((item,index)=>{
+
+        html += `
+        <div>
+            ${item.name}
+            ATK+${item.attack}
+
+            <button onclick="equipWeapon(${index})">
+            裝備
+            </button>
+        </div>
+        `;
+    });
+
+    document.getElementById(
+        "inventory"
+    ).innerHTML = html;
+}
