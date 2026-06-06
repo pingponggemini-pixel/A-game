@@ -158,3 +158,74 @@ function levelCheck() {
         updateUI();
     }
 }
+// ==========================================
+// monster.js - 負責怪物資料、AI 走動與碰撞判定
+// ==========================================
+
+// 場上當前活著的怪物陣列
+let activeMonsters = [];
+
+// 怪物種類範本庫
+const monsterTemplates = {
+    "菇菇寶貝": { name: "菇菇寶貝", hp: 30, maxHp: 30, attack: 4, exp: 12, gold: 6, color: "#ff9966", width: 30, height: 30 },
+    "綠水靈": { name: "綠水靈", hp: 50, maxHp: 50, attack: 8, exp: 22, gold: 12, color: "#66ff66", width: 25, height: 25 }
+};
+
+// 在畫面上隨機生成一隻怪物
+function spawnMonster(type) {
+    let template = monsterTemplates[type];
+    if(!template) return;
+    
+    activeMonsters.push({
+        ...JSON.parse(JSON.stringify(template)),
+        x: Math.random() * (canvas.width - 200) + 150, // 隨機出現在右半邊地圖
+        y: physics.groundY - template.height,
+        direction: Math.random() > 0.5 ? 1 : -1, // 隨機往左或往右走
+        moveTimer: Math.random() * 60
+    });
+}
+
+// 矩形碰撞偵測演算法（用來算有沒有撞到怪或打到怪）
+function checkCollision(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.width &&
+           rect1.x + rect1.width > rect2.x &&
+           rect1.y < rect2.y + rect2.height &&
+           rect1.y + rect1.height > rect2.y;
+}
+
+// 處理 James 的普通攻擊傷害判定
+function executeAttack() {
+    // 定義攻擊範圍框
+    let attackRange = {
+        y: player.y,
+        height: player.height,
+        width: 40,
+        x: player.direction === "right" ? player.x + player.width : player.x - 40
+    };
+
+    // 檢查有沒有打到任何一隻怪物
+    for (let i = activeMonsters.length - 1; i >= 0; i--) {
+        let monster = activeMonsters[i];
+        if (checkCollision(attackRange, monster)) {
+            let dmg = getAttack();
+            monster.hp -= dmg;
+            addLog(`⚔️ James 對 ${monster.name} 造成了 ${dmg} 點傷害！`);
+            
+            // 怪物死亡處理
+            if (monster.hp <= 0) {
+                addLog(`🎉 擊敗了 ${monster.name}！獲得金幣 +${monster.gold}, 經驗 +${monster.exp}`);
+                player.gold += monster.gold;
+                player.exp += monster.exp;
+                
+                let type = monster.name;
+                activeMonsters.splice(i, 1); // 將死掉的怪從場上移除
+                
+                // 3 秒後自動重新孵化一隻新怪
+                setTimeout(() => { spawnMonster(type); }, 3000);
+                
+                levelCheck();
+                updateUI();
+            }
+        }
+    }
+}
