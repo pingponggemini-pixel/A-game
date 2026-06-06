@@ -1,64 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maple RPG</title>
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maple RPG</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="loginScreen">
-    <h1>Maple RPG</h1>
-    <input id="username" placeholder="輸入角色名稱">
-    <button onclick="login()">開始冒險</button>
-</div>
-
-<div id="gameScreen" style="display:none">
-
-    <h2 id="playerName"></h2>
-
-    <div class="stats">
-        <p>等級：<span id="level"></span></p>
-        <p>HP：<span id="hp"></span></p>
-        <p>攻擊：<span id="atk"></span></p>
-        <p>金幣：<span id="gold"></span></p>
+    <div id="loginScreen">
+        <h1>Maple RPG</h1>
+        <input id="username" placeholder="輸入角色名稱">
+        <button onclick="login()">開始冒險</button>
     </div>
 
-    <hr>
+    <div id="gameScreen" style="display:none">
+        <h2 id="playerName"></h2>
 
-    <h3>地圖</h3>
+        <div class="stats">
+            <p>等級：<span id="level"></span></p>
+            <p>HP：<span id="hp"></span></p>
+            <p>攻擊：<span id="atk"></span></p>
+            <p>金幣：<span id="gold"></span></p>
+        </div>
+        
+        <button onclick="saveGame()">存檔</button>
+        <button onclick="loadGame()">讀檔</button>
 
-    <button onclick="fight('菇菇寶貝')">
-        菇菇森林
-    </button>
+        <hr>
 
-    <button onclick="fight('綠水靈')">
-        綠水靈森林
-    </button>
+        <h3>地圖與轉蛋</h3>
+        <button onclick="fight('菇菇寶貝')">菇菇森林</button>
+        <button onclick="fight('綠水靈')">綠水靈森林</button>
+        <button onclick="fight('藍寶王')">藍寶王巢穴</button>
+        <button onclick="gacha()">裝備轉蛋 (20金幣)</button>
 
-    <button onclick="gacha()">
-        裝備轉蛋
-    </button>
+        <div id="log"></div>
 
-    <div id="log"></div>
+        <hr>
 
-</div>
+        <h3>背包</h3>
+        <div id="inventory"></div>
+    </div>
 
-<script src="css/js/game.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
-
-<hr>
-
-<h3>背包</h3>
-
-<div id="inventory"></div>
-
-<button onclick="saveGame()">
-存檔
-</button>
-
-<button onclick="loadGame()">
-讀檔
-</button>
