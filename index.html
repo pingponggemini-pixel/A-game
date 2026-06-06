@@ -3,127 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maple RPG - 第二版 橫向捲軸冒險</title>
-    <style>
-        body {
-            background: #f0f8ff;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 10px;
-        }
-
-        /* 登入區塊 */
-        #loginScreen {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: inline-block;
-            margin-top: 50px;
-        }
-
-        #username {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 200px;
-        }
-
-        /* 遊戲畫布 */
-        canvas {
-            background: #87CEEB; /* 天藍色天空 */
-            display: block;
-            margin: 10px auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border-radius: 4px;
-        }
-
-        /* 遊戲介面排版 */
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            width: 800px;
-            background: #333;
-            color: #fff;
-            padding: 10px 0;
-            font-weight: bold;
-            font-size: 16px;
-            border-radius: 4px;
-        }
-
-        .control-panel {
-            margin: 10px 0;
-        }
-
-        #log {
-            width: 780px;
-            height: 100px;
-            border: 1px solid #ccc;
-            background: #fafafa;
-            overflow-y: auto;
-            text-align: left;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 13px;
-            border-radius: 4px;
-        }
-
-        #inventory {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            background: white;
-            padding: 10px;
-            width: 780px;
-            border-radius: 4px;
-            min-height: 50px;
-            overflow-x: auto;
-        }
-
-        .inv-item {
-            padding: 5px 10px;
-            border: 1px dashed #ff9900;
-            background: #fff9e6;
-            font-size: 12px;
-            border-radius: 3px;
-        }
-
-        button {
-            padding: 8px 15px;
-            background: #ff9900;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover { background: #e68a00; }
-        .btn-sys { background: #4CAF50; }
-        .btn-sys:hover { background: #45a049; }
-        .btn-gacha { background: #9c27b0; }
-        .btn-gacha:hover { background: #7b1fa2; }
-    </style>
+    <title>Maple RPG - 模組化第二版</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div id="loginScreen">
         <h1>🍁 Maple RPG 🍁</h1>
-        <p>第二版：動作冒險世代</p>
-        <input id="username" placeholder="輸入你的角色名稱">
+        <p>歡迎回來，James 的冒險世界</p>
+        <input id="username" placeholder="輸入你的角色名稱" value="James">
         <button onclick="login()">開始冒險</button>
     </div>
 
-    <div id="gameScreen" class="game-container" style="display:none">
+    <div id="gameScreen" style="display:none;">
         <div class="stats-bar">
             <span id="playerName">冒險者</span>
             <span>Lv. <span id="level">1</span></span>
@@ -132,336 +24,30 @@
             <span>金幣: <span id="gold">0</span></span>
         </div>
 
-        <div class="control-panel">
-            <button class="btn-sys" onclick="saveGame()">💾 存檔</button>
-            <button class="btn-sys" style="background:#2196F3" onclick="loadGame()">📂 讀檔</button>
-            <button class="btn-gacha" onclick="gacha()">🎁 轉蛋 (20金)</button>
-            <span style="margin-left:15px; font-size:14px; color:#555;">操作說明：<b>左右方向鍵</b>移動、<b>Alt 鍵</b>跳躍、<b>Ctrl 鍵</b>普通攻擊</span>
-        </div>
-
         <canvas id="gameCanvas" width="800" height="400"></canvas>
 
-        <div id="log"></div>
+        <div class="touch-controls">
+            <div class="d-pad">
+                <div class="touch-btn" id="btnLeft">◀</div>
+                <div class="touch-btn" id="btnRight">▶</div>
+            </div>
+            <div class="action-pad">
+                <div class="touch-btn" id="btnAttack" style="background: rgba(200,0,0,0.6);">攻擊</div>
+                <div class="touch-btn" id="btnJump" style="background: rgba(0,0,200,0.6);">跳躍</div>
+            </div>
+        </div>
 
-        <h4 style="margin: 5px 0 0 0;">🎒 背包</h4>
-        <div id="inventory"></div>
+        <div style="margin: 10px;">
+            <button onclick="saveGame()">💾 存檔</button>
+            <button onclick="loadGame()">📂 讀檔</button>
+            <button onclick="gacha()">🎁 轉蛋 (20金)</button>
+        </div>
+        <div id="log"></div>
     </div>
 
-    <script>
-        // --- 遊戲基本數據 ---
-        let player = {
-            name: "", level: 1, hp: 100, maxHp: 100, baseAttack: 10, gold: 0, exp: 0, inventory: [], weapon: null,
-            // 物理與動態座標屬性
-            x: 100, y: 200, width: 30, height: 45, velocityX: 0, velocityY: 0, speed: 4, jumping: false, grounded: false,
-            isAttacking: false, attackCooldown: 0, direction: "right"
-        };
-
-        // 實體怪物的陣列 (場上可能有多隻怪)
-        let activeMonsters = [];
-
-        // 怪物種類範本
-        const monsterTemplates = {
-            "菇菇寶貝": { name: "菇菇寶貝", hp: 30, maxHp: 30, attack: 4, exp: 12, gold: 6, color: "#ff9966", width: 30, height: 30 },
-            "綠水靈": { name: "綠水靈", hp: 50, maxHp: 50, attack: 8, exp: 22, gold: 12, color: "#66ff66", width: 25, height: 25 }
-        };
-
-        const physics = { gravity: 0.5, friction: 0.8, groundY: 340 };
-        const keys = {};
-
-        // --- 畫布初始化 ---
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        // --- 登入與基礎系統 ---
-        function login() {
-            const nameInput = document.getElementById("username").value.trim();
-            if(!nameInput) return alert("請輸入名字");
-            player.name = nameInput;
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("gameScreen").style.display = "flex";
-            
-            addLog("【系統】遊戲初始化成功！使用方向鍵移動，Alt跳躍，Ctrl打怪。");
-            spawnMonster("菇菇寶貝");
-            spawnMonster("綠水靈");
-            
-            updateUI();
-            updateInventory();
-            // 啟動遊戲畫面的主循環
-            requestAnimationFrame(gameLoop);
-        }
-
-        function updateUI() {
-            document.getElementById("playerName").innerText = "🍁 " + player.name;
-            document.getElementById("level").innerText = player.level;
-            document.getElementById("hp").innerText = Math.max(0, player.hp) + "/" + player.maxHp;
-            document.getElementById("atk").innerText = getAttack();
-            document.getElementById("gold").innerText = player.gold;
-        }
-
-        function getAttack() {
-            return player.baseAttack + (player.weapon ? player.weapon.attack : 0);
-        }
-
-        function addLog(text) {
-            const log = document.getElementById("log");
-            log.innerHTML += text + "<br>";
-            log.scrollTop = log.scrollHeight;
-        }
-
-        // --- 鍵盤監聽 ---
-        window.addEventListener("keydown", (e) => { keys[e.code] = true; });
-        window.addEventListener("keyup", (e) => { keys[e.code] = false; });
-
-        // --- 生成怪物機制 ---
-        function spawnMonster(type) {
-            let template = monsterTemplates[type];
-            if(!template) return;
-            
-            activeMonsters.push({
-                ...JSON.parse(JSON.stringify(template)),
-                x: Math.random() * (canvas.width - 200) + 150, // 隨機生成在右側區域
-                y: physics.groundY - template.height,
-                direction: Math.random() > 0.5 ? 1 : -1,
-                moveTimer: Math.random() * 60
-            });
-        }
-
-        // --- 核心遊戲循環 (每秒 60 次) ---
-        function gameLoop() {
-            // 1. 清空畫面
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 2. 處理玩家左右移動輸入
-            if (keys["ArrowLeft"]) {
-                if (player.velocityX > -player.speed) player.velocityX--;
-                player.direction = "left";
-            }
-            if (keys["ArrowRight"]) {
-                if (player.velocityX < player.speed) player.velocityX++;
-                player.direction = "right";
-            }
-            // 3. 跳躍
-            if (keys["AltLeft"] && !player.jumping && player.grounded) {
-                player.jumping = true;
-                player.grounded = false;
-                player.velocityY = -10; // 跳躍力
-            }
-            // 4. 普通攻擊 (Ctrl 鍵)
-            if (keys["ControlLeft"] && player.attackCooldown <= 0) {
-                player.isAttacking = true;
-                player.attackCooldown = 20; // 攻擊冷卻幀數
-                executeAttack();
-            }
-
-            // 5. 冷卻時間遞減
-            if (player.attackCooldown > 0) {
-                player.attackCooldown--;
-                if (player.attackCooldown < 10) player.isAttacking = false; // 揮刀動作結束
-            }
-
-            // 6. 物理物理模擬運算
-            player.velocityX *= physics.friction;
-            player.velocityY += physics.gravity;
-            player.x += player.velocityX;
-            player.y += player.velocityY;
-
-            // 地面碰撞偵測
-            if (player.y + player.height >= physics.groundY) {
-                player.y = physics.groundY - player.height;
-                player.velocityY = 0;
-                player.jumping = false;
-                player.grounded = true;
-            }
-            // 邊界邊界限制
-            if (player.x < 0) player.x = 0;
-            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
-
-            // 7. 更新與繪製怪物
-            activeMonsters.forEach((monster, index) => {
-                // 怪物隨機走動AI
-                monster.moveTimer--;
-                if(monster.moveTimer <= 0) {
-                    monster.direction = Math.random() > 0.5 ? 1 : -1;
-                    monster.moveTimer = Math.random() * 120 + 30;
-                }
-                monster.x += monster.direction * 0.8;
-                
-                // 怪物邊界限制
-                if(monster.x < 100) monster.direction = 1;
-                if(monster.x + monster.width > canvas.width) monster.direction = -1;
-
-                // 繪製怪物
-                ctx.fillStyle = monster.color;
-                ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
-                // 怪物血條
-                ctx.fillStyle = "red";
-                ctx.fillRect(monster.x, monster.y - 8, monster.width, 4);
-                ctx.fillStyle = "green";
-                ctx.fillRect(monster.x, monster.y - 8, monster.width * (monster.hp / monster.maxHp), 4);
-
-                // 怪物碰觸玩家造成傷害偵測
-                if (checkCollision(player, monster)) {
-                    if (Math.random() < 0.05) { // 降低受傷頻率，不然一碰就秒殺
-                        let damage = monster.attack;
-                        player.hp -= damage;
-                        addLog(`⚠️ 你被 ${monster.name} 撞到了！受到 ${damage} 點傷害。`);
-                        updateUI();
-                        
-                        if(player.hp <= 0) {
-                            addLog("☠️ 你被打倒了！返回安全區補滿血。");
-                            player.x = 100;
-                            player.y = 200;
-                            player.hp = player.maxHp;
-                            updateUI();
-                        }
-                    }
-                }
-            });
-
-            // 8. 繪製遊戲世界場景
-            // 繪製背景草地
-            ctx.fillStyle = "#228B22";
-            ctx.fillRect(0, physics.groundY, canvas.width, canvas.height - physics.groundY);
-
-            // 繪製玩家角色
-            ctx.fillStyle = player.isAttacking ? "#ffff00" : "#ff4500"; // 攻擊時變黃色
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-
-            // 繪製玩家攻擊範圍特效 (Ctrl)
-            if (player.isAttacking) {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-                if (player.direction === "right") {
-                    ctx.fillRect(player.x + player.width, player.y, 40, player.height);
-                } else {
-                    ctx.fillRect(player.x - 40, player.y, 40, player.height);
-                }
-            }
-
-            // 繼續循環
-            requestAnimationFrame(gameLoop);
-        }
-
-        // --- 碰撞偵測函式 ---
-        function checkCollision(rect1, rect2) {
-            return rect1.x < rect2.x + rect2.width &&
-                   rect1.x + rect1.width > rect2.x &&
-                   rect1.y < rect2.y + rect2.height &&
-                   rect1.y + rect1.height > rect2.y;
-        }
-
-        // --- 攻擊判定機制 ---
-        function executeAttack() {
-            let attackRange = {
-                y: player.y,
-                height: player.height,
-                width: 40,
-                x: player.direction === "right" ? player.x + player.width : player.x - 40
-            };
-
-            // 檢查有沒有打到場上的怪物
-            for (let i = activeMonsters.length - 1; i >= 0; i--) {
-                let monster = activeMonsters[i];
-                if (checkCollision(attackRange, monster)) {
-                    let dmg = getAttack();
-                    monster.hp -= dmg;
-                    addLog(`⚔️ 你對 ${monster.name} 造成了 ${dmg} 點傷害！`);
-                    
-                    if (monster.hp <= 0) {
-                        addLog(`🎉 擊敗 ${monster.name}！獲得金幣 +${monster.gold}, 經驗 +${monster.exp}`);
-                        player.gold += monster.gold;
-                        player.exp += monster.exp;
-                        
-                        // 從陣列中移除怪物，並在3秒後重新生成
-                        let type = monster.name;
-                        activeMonsters.splice(i, 1);
-                        setTimeout(() => { spawnMonster(type); }, 3000);
-                        
-                        levelCheck();
-                        updateUI();
-                    }
-                }
-            }
-        }
-
-        // --- 升級檢查 ---
-        function levelCheck() {
-            let needExp = player.level * 50;
-            if(player.exp >= needExp) {
-                player.exp -= needExp;
-                player.level++;
-                player.maxHp += 20;
-                player.hp = player.maxHp;
-                player.baseAttack += 4;
-                addLog(`🌟 恭喜升級！目前等級達 Lv.${player.level}！`);
-                updateUI();
-            }
-        }
-
-        // --- 轉蛋機制 ---
-        function gacha() {
-            if(player.gold < 20) {
-                addLog("<span style='color:red;'>【轉蛋】金幣不足！</span>");
-                return;
-            }
-            player.gold -= 20;
-            let r = Math.random();
-            let item;
-
-            if(r < 0.6) item = { name: "新手木劍", attack: 3 };
-            else if(r < 0.9) item = { name: "合金短劍", attack: 8 };
-            else item = { name: "🍁 楓葉鋼刀 🍁", attack: 22 };
-
-            player.inventory.push(item);
-            addLog(`🎁 轉蛋獲得：<b>${item.name}</b> (ATK +${item.attack})`);
-            updateInventory();
-            updateUI();
-        }
-
-        // --- 背包管理 ---
-        function updateInventory() {
-            const inv = document.getElementById("inventory");
-            if(player.inventory.length === 0) {
-                inv.innerHTML = '<span style="color:#aaa">背包目前是空的</span>';
-                return;
-            }
-            inv.innerHTML = "";
-            player.inventory.forEach((item, index) => {
-                let isEquip = player.weapon === item;
-                inv.innerHTML += `
-                    <div class="inv-item" style="${isEquip ? 'border-color: red; background:#ffe6e6;' : ''}">
-                        <b>${item.name}</b> (ATK +${item.attack}) 
-                        ${isEquip ? '[裝備中]' : `<button style="padding:2px 5px; font-size:11px;" onclick="equip(${index})">裝備</button>`}
-                    </div>
-                `;
-            });
-        }
-
-        function equip(index) {
-            player.weapon = player.inventory[index];
-            addLog(`🗡️ 已裝備 [${player.weapon.name}]`);
-            updateUI();
-            updateInventory();
-        }
-
-        // --- 存/讀檔機制 ---
-        function saveGame() {
-            localStorage.setItem("mapleV2Save", JSON.stringify(player));
-            addLog("【系統】進度存檔成功！");
-        }
-
-        function loadGame() {
-            const save = localStorage.getItem("mapleV2Save");
-            if(save) {
-                player = JSON.parse(save);
-                document.getElementById("loginScreen").style.display = "none";
-                document.getElementById("gameScreen").style.display = "flex";
-                updateUI();
-                updateInventory();
-                addLog(`【系統】成功載入 V2 進度！歡迎回來，${player.name}`);
-            } else {
-                alert("找不到 V2 存檔資料！");
-            }
-        }
-    </script>
+    <script src="js/ui.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/monster.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
