@@ -238,3 +238,16 @@ function updateInventory(){
         "inventory"
     ).innerHTML = html;
 }
+
+function equipWeapon(index){
+
+    player.weapon =
+        player.inventory[index];
+
+    addLog(
+        "裝備了 " +
+        player.weapon.name
+    );
+
+    updateUI();
+}
