@@ -79,6 +79,16 @@ function addLog(text){
         document.getElementById("log").scrollHeight;
 }
 
+function saveGame(){
+
+    localStorage.setItem(
+        "mapleSave",
+        JSON.stringify(player)
+    );
+
+    addLog("存檔成功");
+}
+
 function fight(name){
 
     let monster =
