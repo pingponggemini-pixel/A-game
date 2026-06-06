@@ -4,9 +4,15 @@ let player = {
     level:1,
     hp:100,
     maxHp:100,
-    attack:10,
+
+    baseAttack:10,
+
     gold:0,
-    exp:0
+    exp:0,
+
+    inventory:[],
+
+    weapon:null
 };
 
 const monsters = {
