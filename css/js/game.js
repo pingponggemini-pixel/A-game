@@ -229,3 +229,202 @@ function executeAttack() {
         }
     }
 }
+// ==========================================
+// game.js - 遊戲核心引擎、主循環與世界物理
+// ==========================================
+
+// 1. 全局環境物理常數
+const physics = {
+    gravity: 0.5,   // 重力加速度
+    friction: 0.8,  // 地面/空氣阻力 (造成滑行感)
+    groundY: 340    // 草地表面的 Y 軸高度
+};
+
+// 2. 畫布環境初始化 (在 UI 載入後取得)
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// 3. 遊戲初始化主程式 (當在 ui.js 點擊開始冒險時被呼叫)
+function initGame() {
+    // 啟動平板觸控監聽
+    setupTouchControls();
+
+    // 初始在場上召唤兩隻怪物
+    spawnMonster("菇菇寶貝");
+    spawnMonster("綠水靈");
+
+    // 刷新一次介面
+    updateUI();
+    updateInventory();
+
+    // 正式啟動遊戲主循環
+    requestAnimationFrame(gameLoop);
+}
+
+// 4. 遊戲主循環 (Game Loop - 每秒執行約 60 次)
+function gameLoop() {
+    // ---- A. 清理上一幀的畫面 ----
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ---- B. 處理玩家鍵盤與觸控輸入 ----
+    if (keys["ArrowLeft"]) {
+        if (player.velocityX > -player.speed) player.velocityX--;
+        player.direction = "left";
+    }
+    if (keys["ArrowRight"]) {
+        if (player.velocityX < player.speed) player.velocityX++;
+        player.direction = "right";
+    }
+    // 跳躍限制：必須踩在地上才能跳
+    if (keys["AltLeft"] && !player.jumping && player.grounded) {
+        player.jumping = true;
+        player.grounded = false;
+        player.velocityY = -10; // 往上的跳躍初速度
+    }
+    // 普通攻擊
+    if (keys["ControlLeft"] && player.attackCooldown <= 0) {
+        player.isAttacking = true;
+        player.attackCooldown = 20; // 攻擊冷卻時間 (20幀)
+        executeAttack(); // 觸發 monster.js 的傷害判定
+    }
+
+    // ---- C. 處理攻擊動作計時器 ----
+    if (player.attackCooldown > 0) {
+        player.attackCooldown--;
+        // 前 10 幀顯示揮刀特效，後 10 幀收刀
+        if (player.attackCooldown < 10) player.isAttacking = false;
+    }
+
+    // ---- D. 運算玩家物理運動 (重力與阻力) ----
+    player.velocityX *= physics.friction;
+    player.velocityY += physics.gravity;
+    player.x += player.velocityX;
+    player.y += player.velocityY;
+
+    // 地面碰撞偵測
+    if (player.y + player.height >= physics.groundY) {
+        player.y = physics.groundY - player.height;
+        player.velocityY = 0;
+        player.jumping = false;
+        player.grounded = true;
+    }
+    // 左右地圖邊界限制
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+
+    // ---- E. 運算與繪製怪物 AI ----
+    activeMonsters.forEach((monster) => {
+        // 隨機走動計時器遞減
+        monster.moveTimer--;
+        if(monster.moveTimer <= 0) {
+            monster.direction = Math.random() > 0.5 ? 1 : -1; // 隨機換方向
+            monster.moveTimer = Math.random() * 120 + 30;     // 隨機走 0.5 到 2 秒
+        }
+        
+        // 讓怪物移動
+        monster.x += monster.direction * 0.8;
+        
+        // 怪物撞牆回頭限制
+        if(monster.x < 100) monster.direction = 1;
+        if(monster.x + monster.width > canvas.width) monster.direction = -1;
+
+        // 【繪製怪物主體】
+        ctx.fillStyle = monster.color;
+        ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+
+        // 【繪製怪物血條】
+        ctx.fillStyle = "red";
+        ctx.fillRect(monster.x, monster.y - 8, monster.width, 4);
+        ctx.fillStyle = "green";
+        ctx.fillRect(monster.x, monster.y - 8, monster.width * (monster.hp / monster.maxHp), 4);
+
+        // 【玩家與怪物碰撞偵測】 (James 被怪物撞到扣血)
+        if (checkCollision(player, monster)) {
+            // 限制受傷頻率 (約 5% 機率觸發)，否則每幀都扣血會瞬間秒殺
+            if (Math.random() < 0.05) { 
+                let damage = monster.attack;
+                player.hp -= damage;
+                addLog(`⚠️ James 被 ${monster.name} 撞到了！受到 ${damage} 點傷害。`);
+                updateUI();
+                
+                // 玩家死亡判定
+                if(player.hp <= 0) {
+                    addLog("☠️ James 倒下了... 被安全傳送回弓手村復活。");
+                    player.x = 100;
+                    player.y = 200;
+                    player.hp = player.maxHp;
+                    updateUI();
+                }
+            }
+        }
+    });
+
+    // ---- F. 繪製遊戲背景與地形 ----
+    // 繪製綠色草地
+    ctx.fillStyle = "#228B22";
+    ctx.fillRect(0, physics.groundY, canvas.width, canvas.height - physics.groundY);
+
+    // ---- G. 繪製玩家角色 (James) ----
+    // 攻擊時方塊會變成耀眼的黃色，平常是橘紅色
+    ctx.fillStyle = player.isAttacking ? "#ffff00" : "#ff4500"; 
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+
+    // 繪製攻擊半透明特效
+    if (player.isAttacking) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        if (player.direction === "right") {
+            ctx.fillRect(player.x + player.width, player.y, 40, player.height);
+        } else {
+            ctx.fillRect(player.x - 40, player.y, 40, player.height);
+        }
+    }
+
+    // ---- H. 不斷循環執行此函式 ----
+    requestAnimationFrame(gameLoop);
+}
+
+// 5. 轉蛋功能 (配合 UI)
+function gacha() {
+    if(player.gold < 20) {
+        addLog("<span style='color:red;'>【轉蛋】金幣不足！需要 20 金幣。</span>");
+        return;
+    }
+    player.gold -= 20;
+    let r = Math.random();
+    let item;
+
+    if(r < 0.6) item = { name: "新手木劍", attack: 3 };
+    else if(r < 0.9) item = { name: "合金短劍", attack: 8 };
+    else item = { name: "🍁 楓葉鋼刀 🍁", attack: 22 };
+
+    player.inventory.push(item);
+    addLog(`🎁 James 轉蛋獲得：<b>${item.name}</b> (ATK +${item.attack})`);
+    updateInventory();
+    updateUI();
+}
+
+// 6. 存檔功能
+function saveGame() {
+    localStorage.setItem("mapleModularSave", JSON.stringify(player));
+    addLog("【系統】進度存檔成功！(已保存至本機瀏覽器)");
+}
+
+// 7. 讀檔功能
+function loadGame() {
+    const save = localStorage.getItem("mapleModularSave");
+    if(save) {
+        player = JSON.parse(save);
+        // 跳過登入
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("gameScreen").style.display = "flex";
+        
+        // 重新喚醒控制與刷新
+        setupTouchControls();
+        updateUI();
+        updateInventory();
+        addLog(`【系統】成功載入存檔！歡迎回來，${player.name}`);
+    } else {
+        alert("找不到存檔資料！");
+    }
+}
