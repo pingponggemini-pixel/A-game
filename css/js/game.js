@@ -171,37 +171,50 @@ function gacha(){
 
     player.gold -= 20;
 
-    let r =
-        Math.random();
+    let r = Math.random();
+
+    let item;
 
     if(r < 0.60){
 
-        player.attack += 1;
-
-        addLog("N 木劍 攻擊+1");
+        item = {
+            name:"木劍",
+            attack:1
+        };
     }
 
     else if(r < 0.90){
 
-        player.attack += 3;
-
-        addLog("R 鋼鐵劍 攻擊+3");
+        item = {
+            name:"鋼鐵劍",
+            attack:3
+        };
     }
 
     else if(r < 0.99){
 
-        player.attack += 7;
-
-        addLog("SR 楓葉劍 攻擊+7");
+        item = {
+            name:"楓葉劍",
+            attack:7
+        };
     }
 
     else{
 
-        player.attack += 20;
-
-        addLog("SSR 傳說楓葉劍 攻擊+20");
+        item = {
+            name:"傳說楓葉劍",
+            attack:20
+        };
     }
 
+    player.inventory.push(item);
+
+    addLog(
+        "獲得 " +
+        item.name
+    );
+
+    updateInventory();
     updateUI();
 }
 function getAttack(){
