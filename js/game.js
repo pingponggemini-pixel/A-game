@@ -157,7 +157,7 @@ function levelCheck(){
         player.hp =
             player.maxHp;
 
-        player.attack += 5;
+        player.baseAttack += 5;
 
         addLog(
             "升級！目前 Lv." +
