@@ -134,6 +134,8 @@ function fight(name){
 
             updateUI();
 
+            checkQuest();
+
             return;
         }
 
