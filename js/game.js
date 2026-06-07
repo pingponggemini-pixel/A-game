@@ -78,6 +78,8 @@ function updateUI(){
 
     document.getElementById("gold").innerText =
         player.gold;
+    document.getElementById("mp").innerText =
+        player.mp + "/" + player.maxMp;
 }
 
 function addLog(text){
