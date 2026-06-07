@@ -270,3 +270,20 @@ function saveGame(){
 
     addLog("存檔成功");
 }
+function loadGame(){
+
+    let save =
+        localStorage.getItem(
+            "mapleSave"
+        );
+
+    if(!save) return;
+
+    player =
+        JSON.parse(save);
+
+    updateUI();
+    updateInventory();
+
+    addLog("讀檔成功");
+}
