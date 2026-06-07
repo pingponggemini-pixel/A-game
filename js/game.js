@@ -18,6 +18,8 @@ let player = {
     weapon:null,
 
     potions:3
+
+    slimeKill:0
 };
 const monsters = {
     "菇菇寶貝":{
