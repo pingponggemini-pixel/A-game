@@ -41,6 +41,13 @@ const monsters = {
         attack:20,
         exp:100,
         gold:100
+    },
+    
+    "天空獨角獅":{
+        hp:150,
+        attack:18,
+        exp:40,
+        gold:30
     }
 };
 function login(){
