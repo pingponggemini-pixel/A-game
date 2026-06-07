@@ -316,3 +316,4 @@ function skillAttack(){
 
     updateUI();
 }
+let skillBuff = false;
