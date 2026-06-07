@@ -17,7 +17,7 @@ let player = {
 
     weapon:null,
 
-    potions:3
+    potions:3,
 
     slimeKill:0
 };
