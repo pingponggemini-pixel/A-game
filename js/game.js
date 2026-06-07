@@ -1,8 +1,12 @@
 let player = {
     name:"",
     level:1,
+
     hp:100,
     maxHp:100,
+
+    mp:50,
+    maxMp:50,
 
     baseAttack:10,
 
@@ -11,9 +15,10 @@ let player = {
 
     inventory:[],
 
-    weapon:null
-};
+    weapon:null,
 
+    potions:3
+};
 const monsters = {
     "菇菇寶貝":{
         hp:30,
