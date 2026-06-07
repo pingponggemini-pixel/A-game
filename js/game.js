@@ -342,3 +342,21 @@ function skillAttack(){
 
     updateUI();
 }
+function buyPotion(){
+
+    if(player.gold < 10){
+
+        addLog("金幣不足");
+        return;
+    }
+
+    player.gold -= 10;
+
+    player.potions++;
+
+    addLog(
+        "獲得藥水"
+    );
+
+    updateUI();
+}
