@@ -366,3 +366,16 @@ function buyPotion(){
 
     updateUI();
 }
+function checkQuest(){
+
+    if(player.slimeKill >= 10){
+
+        player.gold += 100;
+
+        player.slimeKill = 0;
+
+        addLog(
+            "完成任務！獲得100金"
+        );
+    }
+}
