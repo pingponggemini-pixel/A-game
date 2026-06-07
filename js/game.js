@@ -157,6 +157,10 @@ function fight(name){
 
             return;
         }
+        if(name === "菇菇寶貝"){
+
+            player.slimeKill++;
+        }
     }
 
     updateUI();
