@@ -95,6 +95,7 @@ function addLog(text){
 
 function fight(name){
 
+    let skillBuff = false;
     let monster =
         JSON.parse(
             JSON.stringify(monsters[name])
