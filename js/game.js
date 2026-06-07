@@ -298,3 +298,19 @@ function loadGame(){
 
     addLog("讀檔成功");
 }
+function skillAttack(){
+
+    if(player.mp < 10){
+
+        addLog("MP不足");
+        return;
+    }
+
+    player.mp -= 10;
+
+    addLog(
+        "火焰斬擊準備完成！"
+    );
+
+    updateUI();
+}
