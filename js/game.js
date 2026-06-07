@@ -101,7 +101,7 @@ function fight(name){
             "你攻擊 " +
             name +
             " 造成 " +
-            player.attack +
+            getAttack() +
             " 傷害"
         );
 
