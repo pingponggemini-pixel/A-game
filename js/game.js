@@ -203,3 +203,14 @@ function gacha(){
 
     updateUI();
 }
+function getAttack(){
+
+    let atk = player.baseAttack;
+
+    if(player.weapon){
+
+        atk += player.weapon.attack;
+    }
+
+    return atk;
+}
