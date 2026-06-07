@@ -89,7 +89,7 @@ function fight(name){
 
     while(player.hp > 0 && monster.hp > 0){
 
-        monster.hp -= player.attack;
+        monster.hp -= getAttack();
 
         addLog(
             "你攻擊 " +
