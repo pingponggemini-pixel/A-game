@@ -261,3 +261,12 @@ function equipWeapon(index){
 
     updateUI();
 }
+function saveGame(){
+
+    localStorage.setItem(
+        "mapleSave",
+        JSON.stringify(player)
+    );
+
+    addLog("存檔成功");
+}
