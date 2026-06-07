@@ -102,7 +102,16 @@ function fight(name){
 
     while(player.hp > 0 && monster.hp > 0){
 
-        monster.hp -= getAttack();
+        let damage = getAttack();
+
+        if(skillBuff){
+
+            damage *= 2;
+
+            skillBuff = false;
+        }
+
+        monster.hp -= damage;
 
         addLog(
             "你攻擊 " +
