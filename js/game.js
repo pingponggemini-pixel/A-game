@@ -315,5 +315,21 @@ function skillAttack(){
     );
 
     updateUI();
+}function skillAttack(){
+
+    if(player.mp < 10){
+
+        addLog("MP不足");
+        return;
+    }
+
+    player.mp -= 10;
+
+    skillBuff = true;
+
+    addLog(
+        "下次攻擊傷害 x2"
+    );
+
+    updateUI();
 }
-let skillBuff = false;
