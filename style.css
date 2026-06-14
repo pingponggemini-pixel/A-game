@@ -14,12 +14,15 @@ body {
     left: 450px;           
     z-index: 2;
 }
-
 .explore-box {
-    color: white;
-    width: 200px;
-    padding: 10px;
+    position: absolute; 
+    top: 10px;      
+    left: 40px;       
+    width: 200px;    
+    height: 150px; 
+    font-size: 12px;
 }
+
 .level-n {
     color: white;
 }
