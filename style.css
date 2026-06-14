@@ -6,13 +6,18 @@ body {
 }
 
 .team-name {
-    color: white;
-    background-color: gold;
+    width: 280px;          
+    height: 180px;         
+    background-size: no-repect;
+    position: absolute;
+    top: 60px;             
+    left: 450px;           
+    z-index: 2;
 }
 
 .explore-box {
-    background-color: #16242f;
-    color: white;
+    background-color: #ECFFFD;
+    color: black;
     width: 350px;
     padding: 20px;
 }
@@ -26,7 +31,7 @@ body {
     height: 180px;         
     background-size: no-repect;
     background-position: -22px -96px; 
-    position: absolute;   
+    position: absolute;
     top: 60px;             
     left: 450px;           
     z-index: 2;          
