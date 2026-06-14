@@ -1,17 +1,30 @@
 body {
-    background-image: url("bg.png"); /* 替換成你生成的檔名 */
+    background-image: url("bg.png");
     background-size: cover;
     background-attachment: fixed;
-    color: white; /* 全域字體預設為白色 */
+    color: white;
 }
 
-.voxel-white{
+.voxel-white {
     color: white;
     background-color: gold;
 }
+
 .explore-box {
     background-color: #16242f;
     color: white;
     width: 350px;
     padding: 20px;
+}
+
+/* ☁️ 漂亮的線上雲朵，這次絕對不會卡住 Vercel */
+.cloud-1 {
+    background-image: url("https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=600&auto=format&fit=crop"); 
+    width: 280px;         
+    height: 180px;        
+    background-size: cover; 
+    position: absolute;   
+    top: 50px;            
+    left: 400px;          
+    z-index: 999;         
 }
