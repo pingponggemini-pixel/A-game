@@ -20,7 +20,7 @@ body {
 /* ☁️ 這是第一朵雲的設定 */
 .cloud-1 {
     /* 直接抓線上優化過的雲朵圖網址 */
-    background-image: url("https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=600&auto=format&fit=crop"); 
+    background-image: url("F733F425-1E3A-4033-AC59-1D885F7AFB45.png"); 
     
     width: 280px;          /* 雲朵寬度 */
     height: 180px;         /* 雲朵高度 */
