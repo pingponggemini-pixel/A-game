@@ -1,0 +1,17 @@
+body {
+    background-image: url("bg.png"); /* 替換成你生成的檔名 */
+    background-size: cover;
+    background-attachment: fixed;
+    color: white; /* 全域字體預設為白色 */
+}
+
+.voxel-white{
+    color: white;
+    background-color: gold;
+}
+.explore-box {
+    background-color: #16242f;
+    color: white;
+    width: 350px;
+    padding: 20px;
+}
