@@ -16,10 +16,9 @@ body {
 }
 
 .explore-box {
-    background-color: #ECFFFD;
-    color: black;
-    width: 350px;
-    padding: 20px;
+    color: white;
+    width: 200px;
+    padding: 10px;
 }
 .level-n {
     color: white;
