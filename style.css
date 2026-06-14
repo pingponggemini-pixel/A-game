@@ -5,7 +5,7 @@ body {
     color: white;
 }
 
-.voxel-white {
+.team-name {
     color: white;
     background-color: gold;
 }
@@ -15,6 +15,9 @@ body {
     color: white;
     width: 350px;
     padding: 20px;
+}
+.level-n {
+    color: white;
 }
 .cloud-1 {
     background-image: url("F733F425-1E3A-4033-AC59-1D885F7AFB45.png"); 
