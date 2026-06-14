@@ -16,19 +16,15 @@ body {
     width: 350px;
     padding: 20px;
 }
-
-/* ☁️ 這是第一朵雲的設定 */
 .cloud-1 {
-    /* 直接抓線上優化過的雲朵圖網址 */
     background-image: url("F733F425-1E3A-4033-AC59-1D885F7AFB45.png"); 
     
-    width: 280px;          /* 雲朵寬度 */
-    height: 180px;         /* 雲朵高度 */
-    background-size: cover;/* 讓圖片填滿這個框框 */
-    
-    /* 讓雲朵飄在城堡上空的定位 */
+    width: 280px;          
+    height: 180px;         
+    background-size: no-repect;
+    background-position: 30px 70px; 
     position: absolute;   
-    top: 60px;             /* 距離網頁頂端 60 像素 */
-    left: 450px;           /* 距離網頁左邊 450 像素 */
-    z-index: 999;          /* 強制讓雲朵顯示在最上層 */
+    top: 60px;             
+    left: 450px;           
+    z-index: 2;          
 }
