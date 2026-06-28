@@ -6,3 +6,5 @@ const player = {
     size: 40,
     color: '#7FFF00'
 };
+ctx.fillStyle = player.color;
+ctx.fillRect(player.x, player.y, player.size, player.size);
